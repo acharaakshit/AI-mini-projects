@@ -222,22 +222,36 @@ class MinesweeperAI():
 
         num = 0
 
-        # perform the action 10 times to ensure that all the knowledge has been inferred
         while num < 10:
-            # create new sentences using existing knowledge
+            sf_cells = set()
+            mn_cells = set()
+
+            # remove any known safe cells or mines from a sentence
+            for sentence in self.knowledge:
+                for cl in sentence.cells:
+                    if cl in self.safes:
+                        sf_cells.add(cell)
+                    elif cl in self.mines:
+                        mn_cells.add(cl)
+                for cl in sf_cells:
+                    self.mark_safe(cl)
+                for cl in mn_cells:
+                    self.mark_mine(cl)
+
+            # remove sentences which have all cell or all mines
+            for sentence in self.knowledge:
+                if sentence.count == 0:
+                    self.infer_knowledge(sentence, 1)
+                elif len(sentence.cells) == sentence.count:
+                    self.infer_knowledge(sentence, -1)
+
+            # remove sentences which are subsets of other sentences
             for sentence1 in self.knowledge:
                 for sentence2 in self.knowledge:
                     if sentence1 != sentence2:
                         if sentence1.cells in sentence2.cells:
                             sentence2.count = sentence2.count - sentence1.count
                             sentence2.remove(sentence1)
-            
-            # keep filtering the knowledge by removing safes and mines
-            for sentence in self.knowledge:
-                if sentence.count == 0:
-                    self.infer_knowledge(sentence, 1)
-                elif len(sentence.cells) == sentence.count:
-                    self.infer_knowledge(sentence, -1)
             num = num + 1
 
     def infer_knowledge(self, sentence, id_flag):
