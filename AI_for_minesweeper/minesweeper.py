@@ -223,12 +223,43 @@ class MinesweeperAI():
         # append sentence to knowledge base
         self.knowledge.append(Sentence(cells, count))
 
-        # find safe cells and mine using logic
+        # infer knowledge
+        self.infer_knowledge()
+        
+        count = 0
+        flag = 1
+        
+        # keep filtering information till none of the sentences can be removed         
+        while flag:
+            senlen = len(self.knowledge)
+            for sentence in self.knowledge:
+                if sentence.count == 0 or len(sentence.cells) == sentence.count:
+                    self.infer_knowledge()
+                else:
+                    count = count + 1
+            if count == senlen:
+                flag = 0
+
+    def infer_knowledge(self):
+
+        # contains the safe cells that can be removed
+        removable_safe_cells = {}
+
+        # find safe cells and mines using logic
         for sentence in self.knowledge:
             if len(sentence.cells) == sentence.count:
                 self.mines.update(sentence.cells)
+                self.knowledge.remove(sentence)
             elif sentence.count == 0:
                 self.safes.update(sentence.cells)
+                removable_safe_cells = sentence.cells
+                self.knowledge.remove(sentence)
+
+        # if the safe cells are found in any of the sentences, they can be removed.
+        for cell1 in removable_safe_cells:
+            for sentence1 in self.knowledge:
+                if cell1 in sentence1.cells:
+                    sentence1.cells.remove(cell1)
 
         # create new sentences using existing knowledge
         for sentence1 in self.knowledge:
@@ -237,8 +268,6 @@ class MinesweeperAI():
                     if sentence1.cells in sentence2.cells:
                         sentence2.count = sentence2.count - sentence1.count
                         sentence2.remove(sentence1)
-
-
 
     def make_safe_move(self):
         """
@@ -268,6 +297,8 @@ class MinesweeperAI():
         while 1:
             # if it is not a mine and not an existing move, then return tuple
             if (i, j) not in self.mines and (i, j) not in self.moves_made:
+                # add to the moves that are already made
+                self.moves_made.add((i, j))
                 return (i, j)
             count = count + 1
             i = random.randrange(self.height)
@@ -275,8 +306,4 @@ class MinesweeperAI():
             # if there is no random move return None
             if count > 10000:
                 return None
-
-
-
-
 
