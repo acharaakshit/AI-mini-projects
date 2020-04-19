@@ -120,6 +120,7 @@ class Sentence():
         a cell is known to be a mine.
         """
         self.cells.discard(cell)
+        self.count = self.count - 1
 
     def mark_safe(self, cell):
         """
@@ -185,13 +186,9 @@ class MinesweeperAI():
         """
         self.moves_made.add(cell)
 
-        self.safes.add(cell)
-        for sentence in self.knowledge:
-            if cell in sentence.cells:
-                sentence.cells.remove(cell)
-                sentence.count = sentence.count - 1
+        self.mark_safe(cell)
 
-        cells = {}
+        cells = set()
         # add the neighbouring cells
         if 7 > cell[0] > 0 and 7 > cell[1] < 0:
             cells = {(cell[0] + 1, cell[1]), (cell[0], cell[1] + 1), (cell[0] - 1, cell[1]),
@@ -223,51 +220,42 @@ class MinesweeperAI():
         # append sentence to knowledge base
         self.knowledge.append(Sentence(cells, count))
 
-        # infer knowledge
-        self.infer_knowledge()
-        
-        count = 0
-        flag = 1
-        
-        # keep filtering information till none of the sentences can be removed         
-        while flag:
-            senlen = len(self.knowledge)
-            for sentence in self.knowledge:
-                if sentence.count == 0 or len(sentence.cells) == sentence.count:
-                    self.infer_knowledge()
-                else:
-                    count = count + 1
-            if count == senlen:
-                flag = 0
+        num = 0
 
-    def infer_knowledge(self):
-
-        # contains the safe cells that can be removed
-        removable_safe_cells = {}
-
-        # find safe cells and mines using logic
-        for sentence in self.knowledge:
-            if len(sentence.cells) == sentence.count:
-                self.mines.update(sentence.cells)
-                self.knowledge.remove(sentence)
-            elif sentence.count == 0:
-                self.safes.update(sentence.cells)
-                removable_safe_cells = sentence.cells
-                self.knowledge.remove(sentence)
-
-        # if the safe cells are found in any of the sentences, they can be removed.
-        for cell1 in removable_safe_cells:
+        # perform the action 10 times to ensure that all the knowledge has been inferred
+        while num < 10:
+            # create new sentences using existing knowledge
             for sentence1 in self.knowledge:
-                if cell1 in sentence1.cells:
-                    sentence1.cells.remove(cell1)
+                for sentence2 in self.knowledge:
+                    if sentence1 != sentence2:
+                        if sentence1.cells in sentence2.cells:
+                            sentence2.count = sentence2.count - sentence1.count
+                            sentence2.remove(sentence1)
+            
+            # keep filtering the knowledge by removing safes and mines
+            for sentence in self.knowledge:
+                if sentence.count == 0:
+                    self.infer_knowledge(sentence, 1)
+                elif len(sentence.cells) == sentence.count:
+                    self.infer_knowledge(sentence, -1)
+            num = num + 1
 
-        # create new sentences using existing knowledge
-        for sentence1 in self.knowledge:
-            for sentence2 in self.knowledge:
-                if sentence1 != sentence2:
-                    if sentence1.cells in sentence2.cells:
-                        sentence2.count = sentence2.count - sentence1.count
-                        sentence2.remove(sentence1)
+    def infer_knowledge(self, sentence, id_flag):
+
+        if id_flag == 1:
+            sf_cells = set()
+            for cell in sentence.cells:
+                sf_cells.add(cell)
+            for cell in sf_cells:
+                self.mark_safe(cell)
+        elif id_flag == -1:
+            mn_cells = set()
+            for cell in sentence.cells:
+                mn_cells.add(cell)
+            for cell in mn_cells:
+                self.mark_mine(cell)
+
+
 
     def make_safe_move(self):
         """
@@ -297,9 +285,7 @@ class MinesweeperAI():
         while 1:
             # if it is not a mine and not an existing move, then return tuple
             if (i, j) not in self.mines and (i, j) not in self.moves_made:
-                # add to the moves that are already made
-                self.moves_made.add((i, j))
-                return (i, j)
+                return i, j
             count = count + 1
             i = random.randrange(self.height)
             j = random.randrange(self.width)
