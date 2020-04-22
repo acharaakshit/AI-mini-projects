@@ -8,4 +8,6 @@ The project 'AI\_for\_tictactoe'  contains the implementation of minimax algorit
 
 The project 'AI\_for\_minesweeper' contains the implementation of an AI for Minesweeper which uses the concept of knowledge and logic. The description of the problem can be found here https://cs50.harvard.edu/extension/ai/2020/spring/projects/1/minesweeper/ .
 
+The project 'Heredity' uses the concept of Uncertainty (joint probability in specific). The desciption of the problem can be found here https://cs50.harvard.edu/extension/ai/2020/spring/projects/2/heredity/ . 
+
 It'd be great if someone can give suggestions on improving the techniques.
