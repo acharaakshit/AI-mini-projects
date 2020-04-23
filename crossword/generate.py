@@ -1,3 +1,4 @@
+import collections
 import copy
 import sys
 
@@ -179,7 +180,6 @@ class CrosswordCreator():
             return False
         return True
 
-
     def order_domain_values(self, var, assignment):
         """
         Return a list of values in the domain of `var`, in order by
@@ -188,13 +188,23 @@ class CrosswordCreator():
         that rules out the fewest values among the neighbors of `var`.
         """
         count = 0
-        for neighbor in self.crossword.neighbors(var):
-            if neighbor in assignment.keys():
-                print(neighbor[1])
-            else:
-                print(neighbor[0])
-        return self.domains[var]
+        # list to keep track of the number of values ruled out for neighboring variables
+        counter_list = [0] * len(self.domains[var])
+        for word in self.domains[var]:
+            for neighbor in self.crossword.neighbors(var):
+                if neighbor not in assignment.keys():
+                    if word in self.domains[neighbor]:
+                        counter_list[count] = counter_list[count] + 1
+            count = count + 1
 
+        # create a dictionary of sorted count values and return sorted domain
+        dom_dict = dict(zip(self.domains[var], counter_list))
+        # descending order of values
+        sorted_dom = sorted(dom_dict.items(), key=lambda kv: kv[1], reverse= True)
+        # convert list of tuples to dict
+        sorted_dom_dict = collections.OrderedDict(sorted_dom)
+        # return list of domains
+        return list(sorted_dom_dict.keys())
 
     def select_unassigned_variable(self, assignment):
         """
@@ -243,7 +253,6 @@ class CrosswordCreator():
                     return result
             assignment.pop(var)
         return 'failure'
-
 
 
 def main():
