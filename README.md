@@ -10,6 +10,6 @@ Artificial Intelligence with Python' which can be found here https://cs50.harvar
 
 'heredity' uses the concept of Uncertainty (joint probability in specific). The desciption of the problem can be found here https://cs50.harvard.edu/extension/ai/2020/spring/projects/2/heredity/ . To run the script use: python heredity.py data/family0.csv (any of the csv files in the data folder can be used as an argument). 
 
-'crossword' uses constraint programming to generate a crossword puzzle. The problem description can be found here https://cs50.harvard.edu/extension/ai/2020/spring/projects/3/crossword/ . To run the script use python generate.py data/structure1.txt data/words1.txt output.png where the first agrument is a structure, second argument is the words file and third is for generating the output.png file for the puzzle.  
+'crossword' uses constraint programming to generate a crossword puzzle. The problem description can be found here https://cs50.harvard.edu/extension/ai/2020/spring/projects/3/crossword/ . To run the script use python generate.py data/structure1.txt data/words1.txt output.png where the first agrument is a structure, second argument is the words file and third is for generating the output.png file for the puzzle. (Ongoing)  
 
 It'd be great if someone can give suggestions on improving the techniques.
