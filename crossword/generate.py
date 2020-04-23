@@ -204,9 +204,19 @@ class CrosswordCreator():
         degree. If there is a tie, any of the tied variables are acceptable
         return values.
         """
+        min = 0
+        min_var = ()
         for var in self.crossword.variables:
             if var not in assignment.keys():
-                return var
+                # choose variable of lowest length
+                if len(var) < min:
+                    min_var = var
+                    min = len(var)
+                elif len(var) == min:
+                    # choose variable of highest degree in case of clash
+                    if len(self.crossword.neighbors(min_var)) < len(self.crossword.neighbors(var)):
+                        min_var = var
+        return min_var
 
     def backtrack(self, assignment):
         """
@@ -219,10 +229,15 @@ class CrosswordCreator():
         """
         if self.assignment_complete(assignment):
             return assignment
+        # if assignment is not complete
+        # choose an unassigned variable
         var = self.select_unassigned_variable(assignment)
+        # traverse through the domain values
         for val in self.order_domain_values(var, assignment):
+            # check for the consistency
             if self.consistent(assignment):
                 assignment[var] = val
+                # recursively call backtrack
                 result = self.backtrack(assignment)
                 if result is not 'failure':
                     return result
