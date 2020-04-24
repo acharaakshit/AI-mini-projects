@@ -12,4 +12,6 @@ Artificial Intelligence with Python' which can be found here https://cs50.harvar
 
 'crossword' uses constraint programming to generate a crossword puzzle. The problem description can be found here https://cs50.harvard.edu/extension/ai/2020/spring/projects/3/crossword/ . To run the script use python generate.py data/structure1.txt data/words1.txt output.png where the first agrument is a structure, second argument is the words file and third is for generating the output.png file for the puzzle.  
 
+'nim' contains the implementation of nim game using Q-Learning. The problem description is here https://cs50.harvard.edu/extension/ai/2020/spring/projects/4/nim/ .
+
 It'd be great if someone can give suggestions on improving the techniques.
